@@ -8,13 +8,13 @@
     <!-- PWA Config -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- iOS PWA Settings -->
+    <!-- iOS PWA Settings (Essential for Full Screen) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Esaad">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#00764b">
 
-    <!-- Icons (Updated to PNG) -->
+    <!-- Icons -->
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="icon" type="image/png" href="logo.png">
 
@@ -25,36 +25,23 @@
         body, html {
             margin: 0; padding: 0; 
             width: 100%; height: 100%;
-            /* لون الخلفية للديسك توب (المساحة الفاضية) 
-               اخترت رمادي غامق ليعطي تركيز ع التطبيق
-            */
             background-color: #1a1a1a; 
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-            font-family: sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overscroll-behavior: none;
-            
-            /* سنتر التطبيق بنص الشاشة */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* === Mobile Wrapper ===
-           هيدا هو "الموبايل" الوهمي 
-        */
+        /* Mobile Wrapper */
         #mobile-viewport {
             position: relative;
             width: 100%;
             height: 100%;
-            
-            /* هون السحر: حددنا العرض الأقصى متل عرض تلفون كبير */
             max-width: 480px; 
-            
-            /* لون خلفية التطبيق */
             background-color: #00764b; 
-            
-            /* الظل كرمال يبين مفصول عن الخلفية ع الديسك توب */
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             overflow: hidden;
         }
@@ -116,30 +103,90 @@
             display: block;
         }
 
+        /* === iOS Install Prompt Style === */
+        #ios-prompt {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 100;
+            display: none; /* مخفي بالاول */
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+            color: #333;
+        }
+
+        #ios-prompt p {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        #ios-prompt span {
+            font-weight: bold;
+            color: #00764b;
+        }
+
+        #ios-prompt .icon-row {
+            margin-top: 10px;
+            font-size: 20px;
+        }
+
+        #close-prompt {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 18px;
+            color: #999;
+            cursor: pointer;
+        }
+
         @keyframes breathe {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- غلفنا كل شي بـ mobile-viewport -->
     <div id="mobile-viewport">
 
+        <!-- Splash -->
         <div id="start-screen">
             <img src="logo.png" id="app-logo" alt="Esaad Logo">
         </div>
 
+        <!-- Video -->
         <div id="video-container" onclick="showCard()">
             <video id="main-video" muted playsinline webkit-playsinline>
                 <source src="video.mp4" type="video/mp4">
             </video>
         </div>
 
+        <!-- Card -->
         <div id="card-container">
             <img src="card.jpg" id="final-card" alt="Esaad Card">
+        </div>
+
+        <!-- iOS Install Prompt (Hidden by default) -->
+        <div id="ios-prompt">
+            <div id="close-prompt" onclick="this.parentElement.style.display='none'">×</div>
+            <p>Install this app for the best experience:</p>
+            <p>Tap <span style="font-size:18px">⎋</span> then <span>Add to Home Screen ➕</span></p>
         </div>
 
     </div>
@@ -152,10 +199,9 @@
         
         let videoEnded = false;
 
+        // === 1. App Logic ===
         window.addEventListener('load', () => {
-            // Wait 1 second
             setTimeout(() => {
-                // Play Video
                 video.play().then(() => {
                     startScreen.style.opacity = '0';
                     startScreen.style.visibility = 'hidden';
@@ -184,10 +230,34 @@
                 setTimeout(() => {
                     videoContainer.style.visibility = 'hidden';
                 }, 500);
-
                 cardContainer.style.visibility = 'visible';
                 cardContainer.style.opacity = '1';
             }
+        }
+
+        // === 2. Service Worker (Android Install) ===
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+
+        // === 3. iOS Detection & Prompt ===
+        function isIos() {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            return /iphone|ipad|ipod/.test(userAgent);
+        }
+
+        function isInStandaloneMode() {
+            return ('standalone' in window.navigator) && (window.navigator.standalone);
+        }
+
+        // Check if device is iOS AND NOT already installed (running in browser)
+        if (isIos() && !isInStandaloneMode()) {
+            // Show the prompt after 2 seconds
+            setTimeout(() => {
+                document.getElementById('ios-prompt').style.display = 'flex';
+            }, 2000);
         }
     </script>
 </body>
