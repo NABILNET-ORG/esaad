@@ -5,31 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Esaad</title>
 
-    <!-- 1. ربط ملف الـ Manifest (ضروري للأندرويد) -->
+    <!-- PWA Config -->
     <link rel="manifest" href="manifest.json">
-
-    <!-- 2. إعدادات iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Esaad">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#00764b">
 
     <!-- Icons -->
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="icon" type="image/jpeg" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.jpg">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
 
     <style>
-        /* منع أي حركة Touch زيادة (Scroll/Zoom) */
+        /* General Reset */
         * { box-sizing: border-box; touch-action: none; }
         
         body, html {
             margin: 0; padding: 0; 
             width: 100%; height: 100%;
-            background-color: #00764b; 
+            /* لون الخلفية للديسك توب (المساحة الفاضية) 
+               اخترت رمادي غامق ليعطي تركيز ع التطبيق
+            */
+            background-color: #1a1a1a; 
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
             font-family: sans-serif;
             overscroll-behavior: none;
+            
+            /* سنتر التطبيق بنص الشاشة */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* === Mobile Wrapper ===
+           هيدا هو "الموبايل" الوهمي 
+        */
+        #mobile-viewport {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            
+            /* هون السحر: حددنا العرض الأقصى متل عرض تلفون كبير */
+            max-width: 480px; 
+            
+            /* لون خلفية التطبيق */
+            background-color: #00764b; 
+            
+            /* الظل كرمال يبين مفصول عن الخلفية ع الديسك توب */
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
         /* Splash Screen */
@@ -98,18 +123,23 @@
 </head>
 <body>
 
-    <div id="start-screen">
-        <img src="logo.png" id="app-logo" alt="Esaad Logo">
-    </div>
+    <!-- غلفنا كل شي بـ mobile-viewport -->
+    <div id="mobile-viewport">
 
-    <div id="video-container" onclick="showCard()">
-        <video id="main-video" muted playsinline webkit-playsinline>
-            <source src="video.mp4" type="video/mp4">
-        </video>
-    </div>
+        <div id="start-screen">
+            <img src="logo.jpg" id="app-logo" alt="Esaad Logo">
+        </div>
 
-    <div id="card-container">
-        <img src="card.jpg" id="final-card" alt="Esaad Card">
+        <div id="video-container" onclick="showCard()">
+            <video id="main-video" muted playsinline webkit-playsinline>
+                <source src="video.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div id="card-container">
+            <img src="card.jpg" id="final-card" alt="Esaad Card">
+        </div>
+
     </div>
 
     <script>
