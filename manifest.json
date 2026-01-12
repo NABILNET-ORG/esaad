@@ -6,16 +6,19 @@
   "background_color": "#00764b",
   "theme_color": "#00764b",
   "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
       "src": "logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
